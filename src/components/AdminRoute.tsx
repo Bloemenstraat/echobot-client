@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
 import NotFound from "../pages/NotFound";
 
 const AdminRoute = ({component: Component, ...rest}: any) => {
