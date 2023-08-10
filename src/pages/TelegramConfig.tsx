@@ -104,6 +104,8 @@ export default function DiscordConfig() {
 
         axios.get(`${import.meta.env.VITE_REMOTE_API}/kubeconfig/configmap/${botId}`)
         .then((res) => {
+            res.data = { ...res.data, bot_name: res.data.BOT_NAME }
+            delete res.data.BOT_NAME
             reset(res.data);
             setModify(true);
         })
@@ -124,7 +126,7 @@ export default function DiscordConfig() {
                 <form onSubmit={handleSubmit(onSubmit)} >
                 <Flex direction='column' gap={10}>
                     <Grid templateColumns='1fr 3fr'>
-                        <FormLabel>Bot name :</FormLabel> <Input isReadOnly={modify} isInvalid={ errors.bot_name ? true : false} errorBorderColor='crimson' {...register("BOT_NAME")} />
+                        <FormLabel>Bot name :</FormLabel> <Input isReadOnly={modify} isInvalid={ errors.bot_name ? true : false} errorBorderColor='crimson' {...register("bot_name")} />
                         <Spacer /> { errors.bot_name && (<Text color='crimson' >{ errors?.bot_name.message }</Text>) }
                     </Grid>
 
