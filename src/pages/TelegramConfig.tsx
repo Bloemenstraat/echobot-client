@@ -45,9 +45,9 @@ export default function DiscordConfig() {
             let key = data[`channel_id_${i}`]
 
             temp[key] =  {
-                image_generation: data[`image_generation_${i}`],
-                summarize: data[`summarize_${i}`],
-                tagging: data[`tagging_${i}`],
+                image_generation: Boolean(data[`image_generation_${i}`]),
+                summarize: Boolean(data[`summarize_${i}`]),
+                tagging: Boolean(data[`tagging_${i}`]),
                 bot_id: data[`bot_id_${i}`],
             };
             features.push(temp);
