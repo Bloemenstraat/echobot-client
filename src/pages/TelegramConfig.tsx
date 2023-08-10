@@ -11,6 +11,7 @@ import { FaKey, FaTelegramPlane, FaCogs } from 'react-icons/fa';
 import { TelegramInputs } from "../types";
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import ChannelConfig from "../components/ChannelConfig";
 
 const schema = yup.object({
     bot_name: yup.string().matches(/^[a-zA-Z]+$/, 'Username must contain only characters').min(3, 'Minimum 3 characters').max(10, 'Maximum 10 characters').required('You need to enter a bot name'),
@@ -26,6 +27,7 @@ export default function DiscordConfig() {
     const [ modify, setModify ] = useState(false);
     const [ loading, setLoading ] = useState(false);
     const [ finished, setFinished ] = useState(false);
+    const [ numConfigs, setNumConfigs] = useState(0);
 
     const {
         register,
@@ -36,9 +38,29 @@ export default function DiscordConfig() {
     
     const onSubmit: SubmitHandler<TelegramInputs> = async (data) => {
 
-        // TODO : loading
+        let features = [];
 
-        const deployment = { type: "telegram", data: data };
+        for (let i = 0; i < numConfigs; i++) {
+            let temp = {};
+            let key = data[`channel_id_${i}`]
+
+            temp[key] =  {
+                image_generation: data[`image_generation_${i}`],
+                summarize: data[`summarize_${i}`],
+                tagging: data[`tagging_${i}`],
+                bot_id: data[`bot_id_${i}`],
+            };
+            features.push(temp);
+
+            delete data[`channel_id_${i}`];
+            delete data[`image_generation_${i}`];
+            delete data[`summarize_${i}`];
+            delete data[`tagging_${i}`];
+            delete data[`bot_id_${i}`];
+
+        }    
+
+        const deployment = { type: "telegram", data: data, features: features };
 
         setLoading(true);
         if (modify) {
@@ -74,6 +96,7 @@ export default function DiscordConfig() {
         return envData;
     }
 */
+
     useEffect(() => {
 
         if (!botId)
@@ -110,7 +133,11 @@ export default function DiscordConfig() {
                         <Heading>API KEYS/TOKENS/IDs</Heading>
                     </Flex>
                     <Grid templateColumns='1fr 3fr'>
-                        <FormLabel>Telegram Bot Token :</FormLabel> <Input {...register("TELEGRAM_BOT_TOKEN")} />                   
+                        <FormLabel>Telegram Bot Token :</FormLabel> <Input {...register("TELEGRAM_BOT_TOKEN")} />  
+                        <FormLabel>Subscription type :</FormLabel> <Input {...register("SUBSCRIPTION")} />
+                        <FormLabel>Echobot Token :</FormLabel> <Input {...register("ECHOBOT_TOKEN")} />
+                        <FormLabel>Echobot app ID :</FormLabel> <Input {...register("ECHOBOT_APP_ID")} /> 
+                        <FormLabel>Bot username :</FormLabel> <Input {...register("BOT_USERNAME")} />                       
                     </Grid>
 
                     <Flex alignItems='center' gap={3} >                    
@@ -136,6 +163,19 @@ export default function DiscordConfig() {
                         <FormLabel>Credit price :</FormLabel> <Input {...register("CREDIT_PRICE")} />
                         <FormLabel>Open AI Model :</FormLabel> <Input {...register("OPENAI_MODEL")} />
                     </Grid>
+
+                    <Flex alignItems='center' gap={3} >                    
+                        <Icon as={ FaCogs } boxSize={6} color='white' />
+                        <Heading>CHANNEL CONFIG</Heading>
+                    </Flex>
+
+                    { [ ...Array(numConfigs).keys() ].map((i) => {
+                        return <ChannelConfig register={register} i={i} key={i} />
+
+                    })}
+
+                    <Button bg='green' color='white' onClick={() => setNumConfigs(numConfigs+1)}>Add a channel bot stuff</Button>
+
 
                     {finished && <Text color='green'>Bot created ! Go bot to the dashboard.</Text>}
                     <Button type='submit' isLoading={loading} loadingText='Creating' >Submit</Button>

@@ -27,8 +27,6 @@ export default function Dashboard() {
 
     }, []);
 
-    console.log(localStorage.getItem('echobot-jwt'))
-
 
     return (
         <Flex w='100%' minH='100vh' bg='#2B2D31' justifyContent='center' pt='5%'>

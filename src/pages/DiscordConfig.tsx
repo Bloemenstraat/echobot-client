@@ -113,7 +113,11 @@ export default function DiscordConfig() {
                         <Heading>API KEYS/TOKENS/IDs</Heading>
                     </Flex>
                     <Grid templateColumns='1fr 3fr'>
-                        <FormLabel>Discord Bot Token :</FormLabel> <Input {...register("discord_token")} />                   
+                        <FormLabel>Discord Bot Token :</FormLabel> <Input {...register("discord_token")} />
+                        <FormLabel>Subscription type :</FormLabel> <Input {...register("subscription")} />
+                        <FormLabel>Subscription ID :</FormLabel> <Input {...register("subscription_id")} />
+                        <FormLabel>Echobot Token :</FormLabel> <Input {...register("echobot_token")} />
+                        <FormLabel>Echobot app ID :</FormLabel> <Input {...register("echobot_app_id")} />                   
                     </Grid>
 
                     <Flex alignItems='center' gap={3} >                    
