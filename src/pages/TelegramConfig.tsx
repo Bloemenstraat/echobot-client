@@ -4,7 +4,7 @@ import { Button, Flex, FormLabel, Grid, Heading, Icon, Input, Spacer, Text } fro
 import { Link } from "react-router-dom"
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { FaKey, FaTelegramPlane, FaCogs } from 'react-icons/fa';
@@ -31,34 +31,32 @@ export default function DiscordConfig() {
 
     const {
         register,
+        control,
         reset,
         handleSubmit,
         formState: { errors },
-      } = useForm<TelegramInputs>({ resolver: yupResolver(schema) })
+      } = useForm<TelegramInputs>({ resolver: yupResolver(schema) });
+
+    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+        control, // control props comes from useForm (optional: if you are using FormContext)
+        name: "config", // unique name for your Field Array
+    });
+
+    const addChannelConfig = () => {
+        append({
+            channel_id: '',
+            image_generation: '',
+            summarize: '',
+            tagging: '',
+            bot_id: ''
+        });
+    };
     
     const onSubmit: SubmitHandler<TelegramInputs> = async (data) => {
 
-        let features = [];
-
-        for (let i = 0; i < numConfigs; i++) {
-            let temp = {};
-            let key = data[`channel_id_${i}`]
-
-            temp[key] =  {
-                image_generation: Boolean(data[`image_generation_${i}`]),
-                summarize: Boolean(data[`summarize_${i}`]),
-                tagging: Boolean(data[`tagging_${i}`]),
-                bot_id: data[`bot_id_${i}`],
-            };
-            features.push(temp);
-
-            delete data[`channel_id_${i}`];
-            delete data[`image_generation_${i}`];
-            delete data[`summarize_${i}`];
-            delete data[`tagging_${i}`];
-            delete data[`bot_id_${i}`];
-
-        }    
+        // const features = JSON.parse(JSON.stringify(data.config));
+        const features = data.config
+        delete data['config']
 
         const deployment = { type: "telegram", data: data, features: features };
 
@@ -171,12 +169,13 @@ export default function DiscordConfig() {
                         <Heading>CHANNEL CONFIG</Heading>
                     </Flex>
 
-                    { [ ...Array(numConfigs).keys() ].map((i) => {
-                        return <ChannelConfig register={register} i={i} key={i} />
 
-                    })}
+                    {fields.map((field, i) => (
+                        <ChannelConfig register={register} remove={remove} i={i} key={field.id} />                          
+                    ))}
 
-                    <Button bg='green' color='white' onClick={() => setNumConfigs(numConfigs+1)}>Add a channel bot stuff</Button>
+
+                    <Button bg='green' color='white' onClick={addChannelConfig}>Add a channel bot stuff</Button>
 
 
                     {finished && <Text color='green'>Bot created ! Go bot to the dashboard.</Text>}
